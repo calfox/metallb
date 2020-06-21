@@ -43,9 +43,11 @@ func (c *layer2Controller) SetConfig(log.Logger, *config.Config) error {
 // If the speakers map is nil, it is ignored.
 func usableNodes(eps *v1.Endpoints, speakers map[string]bool) []string {
 	usable := map[string]bool{}
+	extEp := false
 	for _, subset := range eps.Subsets {
 		for _, ep := range subset.Addresses {
 			if ep.NodeName == nil {
+				extEp = true
 				continue
 			}
 			if speakers != nil {
@@ -57,6 +59,10 @@ func usableNodes(eps *v1.Endpoints, speakers map[string]bool) []string {
 				usable[*ep.NodeName] = true
 			}
 		}
+	}
+
+	if extEp && len(usable) == 0 {
+		usable = activeNodes
 	}
 
 	var ret []string
