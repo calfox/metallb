@@ -62,7 +62,11 @@ func usableNodes(eps *v1.Endpoints, speakers map[string]bool) []string {
 	}
 
 	if extEp && len(usable) == 0 {
-		usable = activeNodes
+		for name, ok := range speakers {
+			if ok {
+				usable[name] = true
+			}
+		}
 	}
 
 	var ret []string
